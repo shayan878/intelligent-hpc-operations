@@ -37,3 +37,20 @@ def test_bot_executes_read_only_tool_and_returns_final_message():
     assert bot.chat("What is the cluster status?") == "worker1 is idle."
     assert any(message["role"] == "tool" for message in bot.history)
     assert "drain_node" not in [x["function"]["name"] for x in client.seen_messages[0][1]]
+
+
+class ConstantClient:
+    def complete(self, messages, tools):
+        return {"role": "assistant", "content": "ok"}
+
+
+def test_bot_keeps_only_the_most_recent_complete_turns():
+    registry = ToolRegistry(SlurmController(FakeRunner()))
+    bot = HPCAdminBot(ConstantClient(), registry, max_history_turns=2)
+
+    for index in range(4):
+        assert bot.chat(f"question {index}") == "ok"
+
+    user_messages = [item["content"] for item in bot.history if item["role"] == "user"]
+    assert user_messages == ["question 2", "question 3"]
+    assert bot.history[0]["role"] == "system"

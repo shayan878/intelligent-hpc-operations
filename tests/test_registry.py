@@ -1,7 +1,7 @@
 import json
 
 from hpc_cluster_lab.assistant.registry import ToolRegistry
-from hpc_cluster_lab.slurm.runner import CommandResult
+from hpc_cluster_lab.slurm.runner import CommandResult, SlurmController
 
 
 class FakeRunner:
@@ -15,8 +15,6 @@ class FakeRunner:
 
 def test_admin_tools_hidden_by_default():
     runner = FakeRunner()
-    from hpc_cluster_lab.slurm.runner import SlurmController
-
     registry = ToolRegistry(SlurmController(runner, ("worker1",)))
     assert "drain_node" not in [x["function"]["name"] for x in registry.schemas]
     result = registry.execute("drain_node", {"node_name": "worker1"})
@@ -26,8 +24,6 @@ def test_admin_tools_hidden_by_default():
 
 def test_admin_tool_requires_explicit_approval():
     runner = FakeRunner()
-    from hpc_cluster_lab.slurm.runner import SlurmController
-
     prompts = []
     registry = ToolRegistry(
         SlurmController(runner, ("worker1",)),
@@ -42,8 +38,6 @@ def test_admin_tool_requires_explicit_approval():
 
 def test_approved_admin_tool_runs_fixed_command():
     runner = FakeRunner()
-    from hpc_cluster_lab.slurm.runner import SlurmController
-
     registry = ToolRegistry(
         SlurmController(runner, ("worker1",)),
         include_admin=True,
@@ -56,9 +50,22 @@ def test_approved_admin_tool_runs_fixed_command():
 
 def test_arbitrary_command_tool_does_not_exist():
     runner = FakeRunner()
-    from hpc_cluster_lab.slurm.runner import SlurmController
-
     registry = ToolRegistry(SlurmController(runner))
     result = registry.execute("run_command", {"command": "id", "node_name": "worker1"})
     assert result["ok"] is False
     assert runner.calls == []
+
+
+def test_approved_admin_action_is_audited(caplog):
+    runner = FakeRunner()
+    registry = ToolRegistry(
+        SlurmController(runner, ("worker1",)),
+        include_admin=True,
+        approval_callback=lambda _: True,
+    )
+    with caplog.at_level("INFO"):
+        result = registry.execute("drain_node", {"node_name": "worker1"})
+
+    assert result["ok"] is True
+    assert "Administrative action requested" in caplog.text
+    assert "Administrative action completed" in caplog.text

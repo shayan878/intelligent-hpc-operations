@@ -47,7 +47,10 @@ class SubprocessRunner:
                 shell=False,
             )
             return CommandResult(
-                tuple(argv), completed.returncode, completed.stdout.strip(), completed.stderr.strip()
+                tuple(argv),
+                completed.returncode,
+                completed.stdout.strip(),
+                completed.stderr.strip(),
             )
         except FileNotFoundError as exc:
             return CommandResult(tuple(argv), 127, "", str(exc))
@@ -73,9 +76,7 @@ class SlurmController:
         return self._run(["sinfo", "-N", "-o", "%N|%T|%C|%m"])
 
     def get_active_jobs(self) -> dict[str, object]:
-        return self._run(
-            ["squeue", "-o", "%.18i %.12P %.20j %.10u %.2t %.10M %.6D %R"]
-        )
+        return self._run(["squeue", "-o", "%.18i %.12P %.20j %.10u %.2t %.10M %.6D %R"])
 
     def get_job_details(self, job_id: str) -> dict[str, object]:
         if not _JOB_ID.fullmatch(job_id):
@@ -92,7 +93,10 @@ class SlurmController:
         self.validate_node(node_name)
         return self._run(
             [
-                "scontrol", "update", f"NodeName={node_name}", "State=DRAIN",
+                "scontrol",
+                "update",
+                f"NodeName={node_name}",
+                "State=DRAIN",
                 "Reason=OperatorApprovedMaintenance",
             ]
         )

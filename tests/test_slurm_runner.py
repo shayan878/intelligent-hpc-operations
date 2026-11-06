@@ -45,7 +45,10 @@ def test_admin_commands_are_argument_arrays():
     controller.drain_node("worker1")
     controller.resume_node("worker1")
     assert runner.calls[0] == [
-        "scontrol", "update", "NodeName=worker1", "State=DRAIN",
+        "scontrol",
+        "update",
+        "NodeName=worker1",
+        "State=DRAIN",
         "Reason=OperatorApprovedMaintenance",
     ]
     assert runner.calls[1] == ["scontrol", "update", "NodeName=worker1", "State=RESUME"]

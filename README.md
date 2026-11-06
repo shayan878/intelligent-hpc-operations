@@ -1,227 +1,202 @@
-# Slurm HPC Cluster Lab
+# Intelligent HPC Operations
 
 <p align="center">
-  <img src="assets/cluster-architecture.svg" alt="HPC cluster architecture: controller, shared NFS storage, Slurm workers and jobs" width="100%">
+  <img src="assets/cluster-architecture.svg" alt="HPC cluster architecture with controller, shared NFS storage, Slurm workers and scheduled jobs" width="100%">
 </p>
 
 <p align="center">
-  <strong>Build. Schedule. Observe. Automate.</strong><br>
-  A reproducible two-worker HPC lab using Slurm, NFS, Linux cgroups, preemption, accounting, multi-node jobs, and a guarded LLM cluster assistant.
+  <strong>Operate. Schedule. Observe. Automate.</strong><br>
+  A modular HPC operations toolkit built around Slurm, NFS, Linux cgroups, workload scheduling, accounting, distributed jobs and guarded LLM-assisted administration.
 </p>
 
 <p align="center">
-  <a href="https://github.com/shayan878/slurm-hpc-cluster-lab/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/CI-Python%20tests-2ea44f?logo=githubactions&logoColor=white" alt="CI"></a>
+  <a href="https://github.com/shayan878/intelligent-hpc-operations/actions/workflows/ci.yml"><img src="https://github.com/shayan878/intelligent-hpc-operations/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
   <img src="https://img.shields.io/badge/Slurm-workload%20manager-2563eb" alt="Slurm">
   <img src="https://img.shields.io/badge/Python-3.10%2B-3776ab?logo=python&logoColor=white" alt="Python">
-  <img src="https://img.shields.io/badge/Linux-Ubuntu%20tested%20workflow-E95420?logo=ubuntu&logoColor=white" alt="Linux">
+  <img src="https://img.shields.io/badge/Linux-HPC-E95420?logo=linux&logoColor=white" alt="Linux">
   <img src="https://img.shields.io/badge/NFS-shared%20storage-0f766e" alt="NFS">
-  <img src="https://img.shields.io/badge/Status-portfolio%20lab-f59e0b" alt="Project status">
+  <img src="https://img.shields.io/badge/Development-early%20stage-f59e0b" alt="Development status">
 </p>
 
-> **What this is:** a hands-on engineering lab based on the supplied HPC internship notes. It documents the cluster setup and turns the original scripts into reusable, testable examples.
->
-> **What this is not:** a production-ready cluster distribution or a claim that the original lab has been independently reproduced on fresh hardware. Hardware-specific values, service versions, and cluster policies must be validated in your environment.
+> **Project scope:** reusable configuration examples, operational documentation, distributed workload examples and a Python package for guarded Slurm administration. This is an engineering portfolio project—not a production-ready cluster distribution or a claim of fresh hardware validation.
 
-## Why this project is interesting
+## Overview
 
-A small HPC cluster is more than a collection of SSH hosts. It needs shared files, consistent identities, a scheduler, resource isolation, accounting, observability, and safe operational controls. This project brings those pieces together and adds an LLM interface that can inspect Slurm state while requiring explicit human approval for administrative changes.
+A useful HPC environment needs more than compute nodes. It needs consistent identities, shared storage, a scheduler, resource enforcement, accounting, monitoring and safe operational workflows.
 
-### Project highlights
+This project brings those components together for a small controller/worker cluster and includes an optional LLM assistant that can inspect live Slurm state. Administrative actions are deliberately constrained: the assistant exposes no arbitrary shell tool, requires an explicit opt-in for administrative tools, checks a configured node allow-list and asks for terminal confirmation before draining or resuming a worker.
 
-| Area | What is included |
+## Capabilities
+
+| Area | Included functionality |
 |---|---|
-| **Cluster architecture** | Controller + worker nodes, shared storage, service boundaries, and a deployment checklist |
-| **NFS** | Restricted export example, client mount instructions, identity and permission considerations |
-| **Slurm** | `slurm.conf`, controller/worker setup, partitions, job submission and monitoring |
-| **Resource isolation** | cgroup v2-oriented configuration, CPU/RAM/swap constraints, and safe validation notes |
-| **Scheduling policy** | Priority tiers and requeue-based preemption example |
-| **Accounting** | MariaDB/SlurmDBD configuration templates and `sacct` workflows |
-| **Distributed workloads** | Modular prime-number workload split across Slurm task ranks |
-| **Python engineering** | Typed configuration, HTTP client, tool registry, command adapter, CLI and unit tests |
-| **LLM cluster assistant** | Read-only status tools by default; allow-listed nodes and explicit approval for drain/resume |
+| **Cluster architecture** | Controller + workers, service boundaries, shared storage and deployment checklists |
+| **NFS** | Restricted export examples, client mounts, UID/GID consistency and permissions |
+| **Slurm** | Controller/worker setup, `slurm.conf`, partitions, job submission and monitoring |
+| **Resource controls** | cgroup v2-oriented templates, CPU/RAM/swap constraints and validation notes |
+| **Scheduling policy** | Partition priority and requeue-based preemption examples |
+| **Accounting** | MariaDB/SlurmDBD templates and `sacct` reporting examples |
+| **Distributed workloads** | Balanced, non-overlapping input ranges using Slurm task ranks |
+| **Python package** | Typed configuration, HTTP client, bounded chat history, tool registry, CLI and tests |
+| **LLM operations assistant** | Read-only status tools by default; approved drain/resume operations with audit logging |
 
 ## Architecture
 
 ```mermaid
 flowchart TB
-    OP[Operator / CLI] --> BOT[HPC Cluster Assistant]
+    OP[Operator / CLI] --> BOT[HPC Operations Assistant]
     BOT --> API[OpenAI-compatible LLM endpoint]
     BOT --> TOOLS[Typed tool registry]
-    TOOLS --> CTRL[Slurm controller APIs / CLI]
+    TOOLS --> CTRL[Fixed Slurm command adapter]
     CTRL --> SCHED[slurmctld + slurmdbd]
-    CTRL --> NFS[NFS shared storage]
     SCHED --> W1[Worker 1: slurmd + cgroups]
     SCHED --> W2[Worker 2: slurmd + cgroups]
-    NFS --- W1
+    NFS[NFS shared storage] --- W1
     NFS --- W2
-    W1 --> JOBS[Scheduled jobs]
+    W1 --> JOBS[Scheduled workloads]
     W2 --> JOBS
     SCHED --> DB[(MariaDB accounting)]
 ```
 
-The Python assistant intentionally does **not** expose arbitrary shell execution to the model. The tool surface is a small set of typed Slurm operations. Mutating operations are hidden unless explicitly enabled, restricted to configured node names, and require an interactive operator confirmation.
-
-## Repository map
+## Repository structure
 
 ```text
-slurm-hpc-cluster-lab/
-├── .github/                 # CI, issue forms, pull-request template
-├── assets/                  # Architecture artwork for the README
+intelligent-hpc-operations/
+├── .github/                         # CI, issue templates and Dependabot
+├── assets/                          # Cluster architecture diagram
 ├── configs/
-│   ├── nfs/                  # Safe NFS export and client mount examples
-│   ├── slurm/                # slurm.conf, cgroup.conf, slurmdbd templates
-│   └── assistant/            # Environment-variable example; no credentials
+│   ├── assistant/                   # Secret-free environment template
+│   ├── nfs/                         # Export and client mount examples
+│   └── slurm/                       # Slurm, cgroup and SlurmDBD templates
 ├── docs/
-│   ├── architecture/         # Cluster design and network assumptions
-│   ├── deployment/           # Controller, worker, NFS, Slurm and identity setup
-│   ├── operations/           # cgroups, preemption, accounting and monitoring
-│   ├── assistant/            # LLM assistant design and safety model
-│   ├── experiments/          # What the internship notes reported
-│   └── security/             # Secrets, NFS and administrative safety
-├── jobs/slurm/               # Single-node, multi-node and scheduler examples
-├── scripts/                  # Health checks and configuration validation
-├── src/hpc_cluster_lab/      # Modular Python package
-│   ├── assistant/            # Config, API client, bot, CLI and tool registry
-│   ├── slurm/                # Safe subprocess adapter for fixed Slurm commands
-│   └── workloads/            # Distributed prime-number example
-└── tests/                    # Unit tests without a live Slurm cluster
+│   ├── architecture/                # Cluster design
+│   ├── assistant/                   # LLM assistant design and safety model
+│   ├── deployment/                  # NFS, Slurm and user identity setup
+│   ├── experiments/                 # Source-grounded internship observations
+│   ├── operations/                  # Accounting, cgroups, preemption, monitoring
+│   └── security/                    # Credential and NFS security notes
+├── jobs/slurm/                      # Single-node, multi-node and policy examples
+├── scripts/                         # Health checks and config preflight
+├── src/hpc_cluster_lab/
+│   ├── assistant/                   # API client, bot, config, tools and CLI
+│   ├── slurm/                       # Fixed-command Slurm adapter
+│   └── workloads/                   # Modular prime-number example
+└── tests/                           # Unit tests with mocked APIs/commands
 ```
 
 ## Quick start
 
-### 1. Understand the target environment
+### Requirements
 
-The examples assume one Slurm controller and two Linux workers. Replace every hostname, network, CPU count, RAM value, partition name, and path with values from your own hosts. On each compute node, inspect the real hardware with:
+- Python 3.10 or newer.
+- Linux for the Slurm command adapter and cluster operations.
+- A reachable OpenAI-compatible endpoint only if you want to use the optional LLM assistant.
+- A configured Slurm cluster only for live cluster operations. Unit tests do not need Slurm, NFS or MariaDB.
 
-```bash
-sudo slurmd -C
-hostname -f
-ip -br address
-```
-
-Do not copy the example node resources into a real `slurm.conf` without checking them against the actual worker configuration.
-
-### 2. Set up shared storage
-
-Read [NFS deployment](docs/deployment/nfs.md), then adapt:
-
-- [`configs/nfs/exports.example`](configs/nfs/exports.example)
-- [`configs/nfs/fstab.example`](configs/nfs/fstab.example)
-
-The export example uses `root_squash` and a documentation-only subnet. Replace the subnet with the smallest trusted cluster network. Avoid `no_root_squash` and world-writable shared folders unless you have a documented, reviewed reason. See the [security notes](docs/security/nfs-and-identities.md).
-
-Read [`docs/deployment/users-and-groups.md`](docs/deployment/users-and-groups.md) before enabling multi-user shared storage.
-
-### 3. Configure Slurm
-
-Start with:
-
-- [`configs/slurm/slurm.conf.example`](configs/slurm/slurm.conf.example)
-- [`configs/slurm/cgroup.conf.example`](configs/slurm/cgroup.conf.example)
-- [`docs/deployment/slurm-controller-and-workers.md`](docs/deployment/slurm-controller-and-workers.md)
-
-The cgroup template is oriented toward modern cgroup v2 systems. Slurm's cgroup v1 plugin is deprecated; confirm your distribution, systemd mode, Slurm release and kernel before enabling enforcement. The official Slurm guide recommends `CgroupPlugin=autodetect` as a general choice for supported systems. [Reference](https://slurm.schedmd.com/cgroup_v2.html).
-
-### 4. Submit a test job
-
-After the cluster is configured and `sinfo` reports the expected nodes, submit a single-worker job:
-
-```bash
-sbatch jobs/slurm/prime-single.sbatch
-```
-
-Then run the two-task distributed example:
-
-```bash
-sbatch jobs/slurm/prime-distributed.sbatch
-```
-
-The Python workload derives a disjoint range from `SLURM_PROCID` and `SLURM_NTASKS`; it does not rely on an unexported Bash array inside a child shell. Ensure the package is installed in the job environment on every worker (or available from a shared virtual environment) before submission; see [`jobs/slurm/README.md`](jobs/slurm/README.md).
-
-### 5. Run the Python checks locally
-
-Requires Python 3.10+.
+### Install the Python package
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install -e '.[dev]'
-ruff check .
-pytest -q
 ```
 
-The tests use fake command runners and mocked HTTP responses. They do not require Slurm, NFS, MariaDB or an LLM endpoint.
+### Run quality checks
 
-### 6. Run the optional LLM assistant
+```bash
+ruff check .
+pytest -q
+python -m compileall -q src tests
+bash -n scripts/*.sh jobs/slurm/*.sbatch
+bash scripts/validate-config.sh configs/slurm/slurm.conf.example
+```
 
-Copy the environment template and configure an OpenAI-compatible endpoint using environment variables:
+### Submit example jobs
+
+After adapting the configuration to your actual cluster and installing this package in the worker job environment:
+
+```bash
+sbatch jobs/slurm/prime-single.sbatch
+sbatch jobs/slurm/prime-distributed.sbatch
+```
+
+The distributed example partitions a half-open integer range using `SLURM_PROCID` and `SLURM_NTASKS`. Each task prints a compact JSON summary by default; use `--include-primes` only when you explicitly need the full result list.
+
+See [Slurm job examples](jobs/slurm/README.md), [deployment instructions](docs/deployment/slurm-controller-and-workers.md) and [configuration examples](configs/slurm/).
+
+### Configure the LLM assistant
+
+Copy the template, fill in your private endpoint settings and load them into the current shell:
 
 ```bash
 cp configs/assistant/.env.example .env
-# Edit .env locally. Never commit it.
+# Edit .env locally. Never commit this file.
 set -a
 source .env
 set +a
 hpc-cluster-assistant
 ```
 
-Required variables: `LLM_BASE_URL` and `LLM_MODEL`. `LLM_API_KEY` is optional for endpoints that do not require authentication. Set `SLURM_ALLOWED_NODES=worker1,worker2` to permit the assistant to target those node names for administrative actions.
+Required variables:
 
-By default, the assistant is read-only. To expose drain/resume tools, start it with:
+- `LLM_BASE_URL`: absolute HTTP(S) base URL ending in `/v1`. Plain HTTP is allowed only for loopback endpoints.
+- `LLM_MODEL`: model name served by the endpoint.
+- `LLM_API_KEY`: optional, depending on endpoint authentication.
+- `LLM_MAX_HISTORY_TURNS`: maximum complete user turns retained in memory (default 12).
+- `SLURM_ALLOWED_NODES`: exact comma-separated node names permitted for maintenance actions.
+
+The assistant is read-only by default. Only enable state-changing tools when you understand their effect:
 
 ```bash
 hpc-cluster-assistant --enable-admin-actions
 ```
 
-Each drain/resume call still requires the operator to type `yes` at the terminal, and node names must match the configured allow-list. Do not run this assistant with an account that has more Slurm privileges than it needs.
+Drain/resume tools are restricted to `SLURM_ALLOWED_NODES`, require typing `yes` in the terminal and generate audit log entries. Run the assistant as a least-privileged account; do not run it as root for convenience.
 
-## What the internship notes covered
+## Operational guides
 
-The original source describes the following progression:
+- [Cluster architecture](docs/architecture/overview.md)
+- [NFS setup](docs/deployment/nfs.md)
+- [Slurm controller and workers](docs/deployment/slurm-controller-and-workers.md)
+- [User and group identities](docs/deployment/users-and-groups.md)
+- [cgroups and resource limits](docs/operations/cgroups-and-resource-limits.md)
+- [Partitions and preemption](docs/operations/preemption-and-partitions.md)
+- [Slurm accounting](docs/operations/accounting.md)
+- [Monitoring and node maintenance](docs/operations/monitoring-and-node-maintenance.md)
+- [LLM assistant design](docs/assistant/design.md)
+- [Security guidance](docs/security/credential-handling.md)
 
-1. **Cluster foundation:** NFS server/client setup, Slurm installation, controller/worker configuration, and a single-node prime-number job.
-2. **Distributed execution:** split a numerical workload across two Slurm tasks and inspect the output from each task.
-3. **Resource management:** cgroup CPU/RAM/swap controls, `batch` and `urgent` partitions, and preemption experiments.
-4. **Accounting and operations:** MariaDB + SlurmDBD, user identity alignment, multiple-user job submission, node drain/resume, `sinfo`, `squeue` and `sacct`.
-5. **LLM operations assistant:** function calling for cluster status, active jobs, node maintenance and command execution. This repository preserves the useful operator workflows but deliberately removes arbitrary command execution from the model-facing interface.
+## Source and reproducibility notes
 
-A source-grounded summary and limitations are in [Internship experiment notes](docs/experiments/internship-observations.md).
+The project was adapted from a collaborative HPC internship record covering NFS, Slurm, two-worker job execution, cgroups, partition preemption, SlurmDBD accounting and an LLM-based cluster assistant.
 
-## Important safety and reproducibility notes
+The original material did not retain complete software versions, all cluster hardware details or raw outputs for every experiment. The repository therefore describes the observed work without claiming independent reproduction. Hardware-specific node resources, package/plugin versions, network ranges and Slurm policies must be checked against your own environment.
 
-- **Credentials:** the supplied source contained a hard-coded API credential and a database password. Neither is included here. Treat exposed credentials as compromised and rotate/revoke them before publishing.
-- **Infrastructure details:** private IP addresses, internal hostnames and the original service domain were replaced with placeholders.
-- **NFS:** exports are limited to a trusted subnet and use root squashing by default. NFS permissions depend on UID/GID consistency across nodes.
-- **Slurm:** configuration syntax and plugins vary by release and distribution. Validate templates against your installed Slurm version before restarting services.
-- **Cgroups:** modern systems generally use cgroup v2. Do not copy the internship's legacy GRUB workaround without checking the current kernel/systemd/Slurm requirements.
-- **Preemption:** with `PreemptMode=REQUEUE`, jobs need `--requeue` or the cluster-wide `JobRequeue=1` setting to be requeued. Understand the effect on checkpoints and job data before enabling it.
-- **LLM safety:** language-model tool calls are untrusted input. Only fixed, typed operations are implemented; never wire model output directly into `shell=True` or an unrestricted remote shell.
-- **License:** the original internship record lists multiple participants. This repository intentionally does not grant a blanket open-source license until the rights to publish and license the collaborative material are confirmed. See [`LICENSE_STATUS.md`](LICENSE_STATUS.md).
+The original notes contained a hard-coded API credential and a database password. They are not included here. Revoke or rotate them if they were ever valid. Do not commit private `.env` files, MUNGE keys, real SlurmDBD credentials, job outputs or sensitive cluster metadata.
 
-## Roadmap
+## Development status
 
-- [ ] Validate the templates on a clean controller + two-worker VM environment.
-- [ ] Add a reproducible deployment using Ansible after the target OS/Slurm release is selected.
-- [ ] Capture redacted `sinfo`, `squeue`, `sacct` and job outputs as example fixtures.
-- [ ] Add job-efficiency and memory-accounting reports from real `sacct` data.
-- [ ] Add additional safe tools: partition summaries, accounting queries and read-only node diagnostics.
-- [ ] Add screenshots or a short terminal demo from a real lab run.
+This project is in an early development stage. CI covers Python linting/tests, shell syntax and a lightweight configuration preflight. It does **not** prove that an NFS mount, Slurm daemon, cgroup policy, database or LLM endpoint works on a real cluster.
+
+Planned work:
+
+- Validate templates on a clean controller + two-worker VM environment.
+- Add reproducible provisioning after choosing a specific OS and Slurm release.
+- Add redacted `sinfo`, `squeue`, `sacct` fixtures and example reports.
+- Expand the assistant with additional read-only diagnostics and structured accounting queries.
+- Publish screenshots or a terminal recording from an actual cluster run.
 
 ## References
 
 - [Slurm documentation](https://slurm.schedmd.com/documentation.html)
-- [Slurm `slurm.conf`](https://slurm.schedmd.com/slurm.conf.html)
-- [Slurm cgroup guide](https://slurm.schedmd.com/cgroups.html)
+- [Slurm configuration reference](https://slurm.schedmd.com/slurm.conf.html)
+- [Slurm cgroups guide](https://slurm.schedmd.com/cgroups.html)
 - [Slurm cgroup v2 notes](https://slurm.schedmd.com/cgroup_v2.html)
 - [Slurm preemption](https://slurm.schedmd.com/preempt.html)
-- [Slurm `slurmdbd.conf`](https://slurm.schedmd.com/slurmdbd.conf.html)
+- [SlurmDBD configuration](https://slurm.schedmd.com/slurmdbd.conf.html)
 - [Ubuntu NFS server guide](https://ubuntu.com/server/docs/how-to/networking/install-nfs/)
-- [Linux `exports(5)`](https://man7.org/linux/man-pages/man5/exports.5.html)
+- [Linux exports manual](https://man7.org/linux/man-pages/man5/exports.5.html)
 
-## Publishing
+## Attribution and licensing
 
-See [`PUBLISHING.md`](PUBLISHING.md) for suggested repository metadata, topics, and exact push commands.
-
-## Acknowledgements
-
-The supplied internship record lists Shayan Daneshyar, Ahmadreza Anami, Bagher Hosseini and Mohammadhesam Imanirad as participants. Confirm the appropriate attribution and publication permissions with all relevant rights holders before making the repository public or adding an open-source license.
+The source internship record lists multiple participants. Confirm attribution and publication permissions with all relevant rights holders before licensing or redistributing collaborative material. No open-source license is granted until that permission is established; see [LICENSE_STATUS.md](LICENSE_STATUS.md).

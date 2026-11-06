@@ -11,7 +11,10 @@ def test_client_sends_tool_payload_and_auth_header():
         observed["url"] = str(request.url)
         observed["authorization"] = request.headers.get("authorization")
         observed["payload"] = request.read().decode()
-        return httpx.Response(200, json={"choices": [{"message": {"role": "assistant", "content": "hello"}}]})
+        return httpx.Response(
+            200,
+            json={"choices": [{"message": {"role": "assistant", "content": "hello"}}]},
+        )
 
     settings = Settings(
         base_url="http://test.local/v1", model="test-model", api_key="test-key"

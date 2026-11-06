@@ -8,15 +8,25 @@ READ_ONLY_TOOLS = [
         "function": {
             "name": "get_cluster_status",
             "description": "Get a read-only summary of Slurm nodes and their states.",
-            "parameters": {"type": "object", "properties": {}, "additionalProperties": False},
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": False,
+            },
         },
     },
     {
         "type": "function",
         "function": {
             "name": "get_active_jobs",
-            "description": "List active and pending Slurm jobs using the current user's queue visibility.",
-            "parameters": {"type": "object", "properties": {}, "additionalProperties": False},
+            "description": (
+                "List active and pending Slurm jobs using the current user's queue visibility."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": False,
+            },
         },
     },
     {
@@ -39,7 +49,10 @@ ADMIN_TOOLS = [
         "type": "function",
         "function": {
             "name": "drain_node",
-            "description": "Request that an allow-listed Slurm worker stop accepting new jobs. Always explain why and wait for operator approval.",
+            "description": (
+                "Request that an allow-listed Slurm worker stop accepting new jobs. "
+                "Explain why and wait for operator approval."
+            ),
             "parameters": {
                 "type": "object",
                 "properties": {"node_name": {"type": "string"}},
@@ -52,7 +65,10 @@ ADMIN_TOOLS = [
         "type": "function",
         "function": {
             "name": "resume_node",
-            "description": "Return an allow-listed worker to service after maintenance has been completed. Always explain why and wait for operator approval.",
+            "description": (
+                "Return an allow-listed worker to service after maintenance. "
+                "Explain why and wait for operator approval."
+            ),
             "parameters": {
                 "type": "object",
                 "properties": {"node_name": {"type": "string"}},

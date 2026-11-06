@@ -1,66 +1,57 @@
-# Publish this repository to GitHub
+# Repository publishing and maintenance
 
-## Recommended metadata
+This repository is already published as:
 
-- **Repository:** `slurm-hpc-cluster-lab`
-- **Description:** `A hands-on Slurm HPC cluster lab: NFS shared storage, cgroup resource controls, partition preemption, accounting, multi-node workloads, and a guarded LLM operations assistant.`
-- **Visibility:** Public only after publication permission and credential rotation are confirmed.
-- **Topics:** `slurm`, `hpc`, `workload-manager`, `distributed-computing`, `nfs`, `cgroups`, `linux`, `python`, `llm`, `cluster-management`, `job-scheduler`, `ai-ops`.
+https://github.com/shayan878/intelligent-hpc-operations
 
-## Create the empty repository
+## Recommended GitHub About metadata
 
-On GitHub, choose **New repository**, use the name above, and do not initialise it with a README, `.gitignore` or license. This archive already contains project files.
+**Description**
 
-## Push with GitHub CLI
+`An intelligent HPC operations toolkit featuring Slurm workload scheduling, distributed computing, resource isolation, NFS shared storage, accounting, and LLM-powered cluster administration.`
 
-Extract the ZIP, open a terminal in the extracted `slurm-hpc-cluster-lab` directory, and run:
+**Topics**
+
+`hpc`, `slurm`, `cluster-management`, `distributed-systems`, `workload-scheduling`, `nfs`, `cgroups`, `python`, `llm`, `ai-operations`, `linux`, `automation`.
+
+Set these in the repository's About panel using its settings icon. The GitHub connection used for repository code changes cannot edit repository description/topics directly.
+
+## Branch protection
+
+For a personal portfolio repository, protect `main` against accidental force-push and deletion. Recommended rules:
+
+- Require a pull request before merging.
+- Require the CI workflow to pass before merging.
+- Block force pushes.
+- Block branch deletion.
+
+Enable these in **Settings → Rules → Rulesets** (or **Settings → Branches**, depending on the GitHub UI). Do not require an additional reviewer unless you have someone who can review your changes.
+
+## Dependency updates
+
+Dependabot is configured for GitHub Actions and Python dependencies. Review update PRs after the base branch CI is green. Merge only updates whose diff and workflow results you understand.
+
+## Before a public announcement
+
+- [ ] Confirm that the internship material may be published and attributed.
+- [ ] Rotate any credentials that appeared in the original source material.
+- [ ] Keep private `.env`, MUNGE keys, real SlurmDBD config and job outputs out of Git.
+- [ ] Confirm that the README CI badge reflects the actual workflow result.
+- [ ] Run the unit tests and config preflight locally.
+- [ ] Add a real terminal demo only after validating the project on a cluster you control.
+- [ ] Do not claim production-readiness or measured performance without reproducible evidence.
+
+## Local maintenance commands
 
 ```bash
-gh auth login
-git init -b main
-git add .
-git status --short
-# Inspect the staged file list before committing.
-git commit -m "Initial commit: Slurm HPC cluster lab"
-gh repo create slurm-hpc-cluster-lab \
-  --public \
-  --description "A hands-on Slurm HPC cluster lab: NFS, cgroups, preemption, accounting, multi-node jobs and a guarded LLM assistant." \
-  --source=. \
-  --remote=origin \
-  --push
+python -m pip install -e '.[dev]'
+ruff check .
+pytest -q
+python -m compileall -q src tests
+bash -n scripts/*.sh jobs/slurm/*.sbatch
+bash scripts/validate-config.sh configs/slurm/slurm.conf.example
 ```
 
-If you created the empty repository in the browser instead, add its remote and push:
+## Licensing
 
-```bash
-git remote add origin https://github.com/shayan878/slurm-hpc-cluster-lab.git
-git push -u origin main
-```
-
-## Set repository topics
-
-```bash
-gh repo edit shayan878/slurm-hpc-cluster-lab \
-  --add-topic slurm \
-  --add-topic hpc \
-  --add-topic workload-manager \
-  --add-topic distributed-computing \
-  --add-topic nfs \
-  --add-topic cgroups \
-  --add-topic linux \
-  --add-topic python \
-  --add-topic llm \
-  --add-topic cluster-management \
-  --add-topic job-scheduler \
-  --add-topic ai-ops
-```
-
-Then enable Issues and Discussions if you plan to maintain the project, confirm GitHub Actions succeeds, and pin the repository on your profile.
-
-## Before making it public
-
-- Rotate/revoke the LLM API credential and database password that appeared in the supplied source material.
-- Confirm permission to publish the collaborative internship material and its attribution.
-- Keep private `.env`, SlurmDBD config, MUNGE key files, host-specific addresses, screenshots and job outputs out of the commit.
-- Do not add an open-source license until rights holders agree; see [`LICENSE_STATUS.md`](LICENSE_STATUS.md).
-- Read the staged file list carefully before pushing.
+No open-source license is included until the collaborative internship source material's publication and licensing rights are confirmed. See [LICENSE_STATUS.md](LICENSE_STATUS.md).

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from collections.abc import Callable
 from typing import Any
 
@@ -10,6 +11,7 @@ from hpc_cluster_lab.assistant.schemas import tool_schemas
 from hpc_cluster_lab.slurm.runner import SlurmController
 
 ApprovalCallback = Callable[[str], bool]
+logger = logging.getLogger(__name__)
 
 
 class ToolRegistry:
@@ -55,7 +57,7 @@ class ToolRegistry:
             if name in {"drain_node", "resume_node"}:
                 return self._execute_admin(name, args)
             return {"ok": False, "error": f"Unknown tool: {name}"}
-        except (ValueError, PermissionError, json.JSONDecodeError) as exc:
+        except (ValueError, PermissionError) as exc:
             return {"ok": False, "error": str(exc)}
 
     @staticmethod
@@ -76,17 +78,27 @@ class ToolRegistry:
         if not isinstance(node_name, str) or not node_name:
             raise ValueError("node_name must be a non-empty string")
 
-        # Validate allow-list before prompting, so the model cannot solicit approval
-        # for a node outside this operator's configured maintenance scope.
         self._controller.validate_node(node_name)
         if self._approval_callback is None:
             return {"ok": False, "error": "No interactive approval callback is configured"}
 
         verb = "drain" if name == "drain_node" else "resume"
+        logger.info("Administrative action requested: action=%s node=%s", verb, node_name)
         message = f"Approve {verb} operation for Slurm node '{node_name}'?"
         if not self._approval_callback(message):
+            logger.warning("Administrative action denied: action=%s node=%s", verb, node_name)
             return {"ok": False, "denied": True, "error": "Operator declined the operation"}
 
         if name == "drain_node":
-            return self._controller.drain_node(node_name)
-        return self._controller.resume_node(node_name)
+            result = self._controller.drain_node(node_name)
+        else:
+            result = self._controller.resume_node(node_name)
+
+        logger.info(
+            "Administrative action completed: action=%s node=%s ok=%s returncode=%s",
+            verb,
+            node_name,
+            result.get("ok"),
+            result.get("returncode"),
+        )
+        return result

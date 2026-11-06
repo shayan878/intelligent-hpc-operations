@@ -18,9 +18,10 @@ class Settings:
     timeout_seconds: float = 60.0
     allowed_nodes: tuple[str, ...] = ()
     max_tool_rounds: int = 6
+    max_history_turns: int = 12
 
     @classmethod
-    def from_env(cls) -> "Settings":
+    def from_env(cls) -> Settings:
         base_url = os.getenv("LLM_BASE_URL", "").strip().rstrip("/")
         model = os.getenv("LLM_MODEL", "").strip()
         if not base_url or not model:
@@ -39,6 +40,13 @@ class Settings:
         if timeout_seconds <= 0:
             raise ValueError("LLM_TIMEOUT_SECONDS must be greater than zero")
 
+        try:
+            max_history_turns = int(os.getenv("LLM_MAX_HISTORY_TURNS", "12"))
+        except ValueError as exc:
+            raise ValueError("LLM_MAX_HISTORY_TURNS must be an integer") from exc
+        if max_history_turns < 1:
+            raise ValueError("LLM_MAX_HISTORY_TURNS must be at least 1")
+
         nodes = tuple(
             item.strip()
             for item in os.getenv("SLURM_ALLOWED_NODES", "").split(",")
@@ -56,4 +64,5 @@ class Settings:
             api_key=os.getenv("LLM_API_KEY") or None,
             timeout_seconds=timeout_seconds,
             allowed_nodes=nodes,
+            max_history_turns=max_history_turns,
         )

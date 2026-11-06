@@ -1,4 +1,4 @@
-"""Prime-number workload that partitions a half-open range across Slurm task ranks."""
+"""Prime-number workload partitioned across Slurm task ranks."""
 
 from __future__ import annotations
 
@@ -48,10 +48,22 @@ def primes_in_range(start: int, end: int) -> list[int]:
     return [value for value in range(max(2, start), end) if is_prime(value)]
 
 
+def count_primes_in_range(start: int, end: int) -> int:
+    """Count primes without retaining the complete result list in memory."""
+    if end < start:
+        raise ValueError("end must be greater than or equal to start")
+    return sum(1 for value in range(max(2, start), end) if is_prime(value))
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--start", type=int, default=1, help="Inclusive range start")
     parser.add_argument("--end", type=int, default=1000, help="Exclusive range end")
+    parser.add_argument(
+        "--include-primes",
+        action="store_true",
+        help="Include the full list of primes in the JSON output (can be large)",
+    )
     return parser
 
 
@@ -63,15 +75,16 @@ def main(argv: list[str] | None = None) -> int:
     rank = int(os.getenv("SLURM_PROCID", "0"))
     world_size = int(os.getenv("SLURM_NTASKS", "1"))
     local_start, local_end = partition_range(args.start, args.end, rank, world_size)
-    found = primes_in_range(local_start, local_end)
     result = {
         "rank": rank,
         "world_size": world_size,
         "range_start": local_start,
         "range_end_exclusive": local_end,
-        "prime_count": len(found),
-        "primes": found,
+        "prime_count": count_primes_in_range(local_start, local_end),
     }
+    if args.include_primes:
+        result["primes"] = primes_in_range(local_start, local_end)
+
     print(json.dumps(result, separators=(",", ":")))
     return 0
 

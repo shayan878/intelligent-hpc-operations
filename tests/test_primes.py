@@ -1,4 +1,9 @@
-from hpc_cluster_lab.workloads.primes import is_prime, partition_range, primes_in_range
+from hpc_cluster_lab.workloads.primes import (
+    count_primes_in_range,
+    is_prime,
+    partition_range,
+    primes_in_range,
+)
 
 
 def test_is_prime_handles_small_and_composite_values():
@@ -34,3 +39,7 @@ def test_partition_range_validation():
         partition_range(1, 10, 2, 2)
     with pytest.raises(ValueError):
         partition_range(1, 10, 0, 0)
+
+
+def test_count_primes_in_range_matches_list():
+    assert count_primes_in_range(1, 100) == len(primes_in_range(1, 100))

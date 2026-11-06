@@ -35,3 +35,18 @@ def test_settings_reject_remote_http(monkeypatch):
     monkeypatch.setenv("LLM_MODEL", "lab-model")
     with pytest.raises(ValueError, match="HTTPS"):
         Settings.from_env()
+
+
+def test_settings_reject_non_positive_history_limit(monkeypatch):
+    monkeypatch.setenv("LLM_BASE_URL", "http://localhost:8000/v1")
+    monkeypatch.setenv("LLM_MODEL", "lab-model")
+    monkeypatch.setenv("LLM_MAX_HISTORY_TURNS", "0")
+    with pytest.raises(ValueError, match="at least 1"):
+        Settings.from_env()
+
+
+def test_settings_loads_history_limit(monkeypatch):
+    monkeypatch.setenv("LLM_BASE_URL", "http://localhost:8000/v1")
+    monkeypatch.setenv("LLM_MODEL", "lab-model")
+    monkeypatch.setenv("LLM_MAX_HISTORY_TURNS", "5")
+    assert Settings.from_env().max_history_turns == 5

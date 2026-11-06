@@ -24,7 +24,7 @@ class OpenAICompatibleClient:
     def close(self) -> None:
         self._client.close()
 
-    def __enter__(self) -> "OpenAICompatibleClient":
+    def __enter__(self) -> OpenAICompatibleClient:
         return self
 
     def __exit__(self, *_: object) -> None:
