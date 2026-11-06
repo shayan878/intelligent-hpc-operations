@@ -1,6 +1,6 @@
 {
-  "repository_name": "slurm-hpc-cluster-lab",
-  "generated_for": "HPC internship project: NFS, Slurm, cgroups, preemption, accounting, multi-node jobs and LLM cluster assistant",
+  "repository_name": "intelligent-hpc-operations",
+  "generated_for": "HPC operations: NFS, Slurm, cgroups, preemption, accounting, distributed workloads and guarded LLM administration",
   "file_count": 62,
   "files": [
     ".editorconfig",
