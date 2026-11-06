@@ -64,7 +64,10 @@ def main(argv: list[str] | None = None) -> int:
                 max_tool_rounds=settings.max_tool_rounds,
                 max_history_turns=settings.max_history_turns,
             )
-            print("Intelligent HPC Operations AI Assistant | read-only by default | type 'exit' to quit")
+            print(
+                "Intelligent HPC Operations AI Assistant | read-only by default | "
+                "type exit to quit"
+            )
             if args.enable_admin_actions:
                 print("Administrative tools enabled; every change requires terminal approval.")
             while True:
