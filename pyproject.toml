@@ -26,7 +26,7 @@ classifiers = [
 dependencies = ["httpx>=0.27,<1"]
 
 [project.optional-dependencies]
-dev = ["pytest>=8,<9", "ruff>=0.6,<1"]
+dev = ["pytest>=8,<10", "ruff>=0.6,<1"]
 
 [project.scripts]
 hpc-cluster-assistant = "hpc_cluster_lab.assistant.cli:main"
