@@ -10,4 +10,4 @@
 
 set -Eeuo pipefail
 
-python3 -m hpc_cluster_lab.workloads.primes --start 1 --end 100000
+python3 -m intelligent_hpc_operations.workloads.primes --start 1 --end 100000

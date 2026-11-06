@@ -13,4 +13,4 @@
 set -Eeuo pipefail
 
 # Each task computes a unique interval based on SLURM_PROCID / SLURM_NTASKS.
-srun --ntasks="${SLURM_NTASKS}" python3 -m hpc_cluster_lab.workloads.primes --start 1 --end 100000
+srun --ntasks="${SLURM_NTASKS}" python3 -m intelligent_hpc_operations.workloads.primes --start 1 --end 100000

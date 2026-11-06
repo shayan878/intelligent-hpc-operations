@@ -15,7 +15,7 @@ venv/
 .env
 .env.*
 !.env.example
-configs/assistant/local.env
+configs/ai_assistant/local.env
 configs/slurm/slurm.conf
 configs/slurm/cgroup.conf
 configs/slurm/slurmdbd.conf

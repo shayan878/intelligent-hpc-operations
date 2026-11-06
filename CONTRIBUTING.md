@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping improve the Slurm HPC Cluster Lab.
+Thanks for helping improve Intelligent HPC Operations.
 
 ## Development setup
 
