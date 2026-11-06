@@ -1,0 +1,35 @@
+name: Bug report
+description: Report a reproducible issue in code or documentation.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Include the exact error with secrets and private host details removed.
+    validations:
+      required: true
+  - type: input
+    id: slurm
+    attributes:
+      label: Slurm version
+      placeholder: "slurm 24.xx"
+  - type: input
+    id: os
+    attributes:
+      label: OS / kernel
+      placeholder: "Ubuntu Server / kernel version"
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety check
+      options:
+        - label: I removed credentials, private IPs, internal domains and personal data.
+          required: true

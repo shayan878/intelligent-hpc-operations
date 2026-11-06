@@ -1,0 +1,3 @@
+# Example /etc/exports entry. 192.0.2.0/24 is a documentation-only network.
+# Replace it with the smallest trusted cluster subnet before applying.
+/srv/hpc/shared 192.0.2.0/24(rw,sync,no_subtree_check,root_squash)

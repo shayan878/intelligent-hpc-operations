@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "slurm-hpc-cluster-lab"
+version = "0.1.0"
+description = "A reproducible Slurm HPC cluster lab with NFS, cgroups, scheduling examples and a guarded LLM assistant."
+readme = "README.md"
+requires-python = ">=3.10"
+maintainers = [{ name = "Shayan Daneshyar" }]
+keywords = ["hpc", "slurm", "nfs", "cgroups", "cluster", "llm", "operations"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: System Administrators",
+  "Intended Audience :: Developers",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: System :: Distributed Computing",
+  "Topic :: System :: Clustering",
+]
+dependencies = ["httpx>=0.27,<1"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<9", "ruff>=0.6,<1"]
+
+[project.scripts]
+hpc-cluster-assistant = "hpc_cluster_lab.assistant.cli:main"
+hpc-prime-workload = "hpc_cluster_lab.workloads.primes:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

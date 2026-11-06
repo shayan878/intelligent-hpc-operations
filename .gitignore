@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+.venv/
+venv/
+
+# Local credentials and operator-specific configuration
+.env
+.env.*
+!.env.example
+configs/assistant/local.env
+configs/slurm/slurm.conf
+configs/slurm/cgroup.conf
+configs/slurm/slurmdbd.conf
+*.key
+*.pem
+secrets/
+
+# Cluster and benchmark output
+*.out
+*.err
+slurm-*.out
+results/
+logs/
+*.log

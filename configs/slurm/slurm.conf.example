@@ -1,0 +1,40 @@
+# Example only. Validate all paths, plugins, resources and names on your Slurm release.
+ClusterName=hpc-lab
+SlurmctldHost=controller
+SlurmUser=slurm
+
+SlurmctldPort=6817
+SlurmdPort=6818
+AuthType=auth/munge
+MpiDefault=none
+
+StateSaveLocation=/var/spool/slurmctld
+SlurmdSpoolDir=/var/spool/slurmd
+SlurmctldLogFile=/var/log/slurm/slurmctld.log
+SlurmdLogFile=/var/log/slurm/slurmd.log
+
+SchedulerType=sched/backfill
+SelectType=select/cons_tres
+PriorityType=priority/multifactor
+
+# Resource enforcement and job accounting via cgroups.
+ProctrackType=proctrack/cgroup
+TaskPlugin=task/cgroup,task/affinity
+JobAcctGatherType=jobacct_gather/cgroup
+JobAcctGatherFrequency=30
+
+# Requeue jobs selected for preemption. Jobs can also request --requeue explicitly.
+PreemptType=preempt/partition_prio
+PreemptMode=REQUEUE
+JobRequeue=1
+
+# Enable accounting only after slurmdbd is configured and reachable.
+AccountingStorageType=accounting_storage/slurmdbd
+AccountingStorageHost=controller
+
+# Replace resource values with `slurmd -C` output on each worker.
+NodeName=worker[1-2] CPUs=1 RealMemory=1200 State=UNKNOWN
+
+# Higher PriorityTier jobs can preempt lower-tier jobs when preemption is enabled.
+PartitionName=batch  Nodes=worker[1-2] Default=YES MaxTime=INFINITE State=UP PriorityTier=1
+PartitionName=urgent Nodes=worker[1-2]              MaxTime=01:00:00 State=UP PriorityTier=2

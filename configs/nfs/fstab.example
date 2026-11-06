@@ -1,0 +1,2 @@
+# Example client mount. Replace controller and the mount path for your site.
+controller:/srv/hpc/shared  /srv/hpc/shared  nfs4  defaults,_netdev,nofail,x-systemd.automount  0  0

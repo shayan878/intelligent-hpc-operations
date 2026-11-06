@@ -1,0 +1,8 @@
+# Modern cgroup v2-friendly starting point. Verify support with your OS and Slurm build.
+CgroupPlugin=autodetect
+ConstrainCores=yes
+ConstrainRAMSpace=yes
+ConstrainSwapSpace=yes
+ConstrainDevices=yes
+AllowedRAMSpace=100
+AllowedSwapSpace=0
