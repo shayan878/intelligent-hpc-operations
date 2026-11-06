@@ -3,13 +3,15 @@
 from __future__ import annotations
 
 import argparse
+import logging
+import os
 import sys
 
-from hpc_cluster_lab.assistant.api_client import OpenAICompatibleClient
-from hpc_cluster_lab.assistant.bot import HPCAdminBot
-from hpc_cluster_lab.assistant.config import Settings
-from hpc_cluster_lab.assistant.registry import ToolRegistry
-from hpc_cluster_lab.slurm.runner import SlurmController
+from intelligent_hpc_operations.ai_assistant.api_client import OpenAICompatibleClient
+from intelligent_hpc_operations.ai_assistant.bot import HPCAdminBot
+from intelligent_hpc_operations.ai_assistant.config import Settings
+from intelligent_hpc_operations.ai_assistant.registry import ToolRegistry
+from intelligent_hpc_operations.slurm.runner import SlurmController
 
 
 def _confirm(prompt: str) -> bool:
@@ -30,6 +32,10 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    logging.basicConfig(
+        level=os.getenv("LOG_LEVEL", "INFO").upper(),
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    )
     try:
         settings = Settings.from_env()
     except ValueError as exc:
@@ -52,8 +58,13 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         with OpenAICompatibleClient(settings) as client:
-            bot = HPCAdminBot(client, registry, max_tool_rounds=settings.max_tool_rounds)
-            print("Slurm HPC Assistant | read-only by default | type 'exit' to quit")
+            bot = HPCAdminBot(
+                client,
+                registry,
+                max_tool_rounds=settings.max_tool_rounds,
+                max_history_turns=settings.max_history_turns,
+            )
+            print("Intelligent HPC Operations AI Assistant | read-only by default | type 'exit' to quit")
             if args.enable_admin_actions:
                 print("Administrative tools enabled; every change requires terminal approval.")
             while True:
@@ -69,6 +80,7 @@ def main(argv: list[str] | None = None) -> int:
                 try:
                     print(f"\nAssistant: {bot.chat(message)}")
                 except Exception as exc:  # Keep interactive session alive on a request failure.
+                    logging.exception("Assistant request failed")
                     print(f"Request failed: {exc}", file=sys.stderr)
     except KeyboardInterrupt:
         print("\nExiting.")

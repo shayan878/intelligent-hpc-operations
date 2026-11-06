@@ -1,7 +1,7 @@
 import httpx
 
-from hpc_cluster_lab.assistant.api_client import OpenAICompatibleClient
-from hpc_cluster_lab.assistant.config import Settings
+from intelligent_hpc_operations.ai_assistant.api_client import OpenAICompatibleClient
+from intelligent_hpc_operations.ai_assistant.config import Settings
 
 
 def test_client_sends_tool_payload_and_auth_header():

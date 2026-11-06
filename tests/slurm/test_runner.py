@@ -1,6 +1,6 @@
 import pytest
 
-from hpc_cluster_lab.slurm.runner import CommandResult, SlurmController
+from intelligent_hpc_operations.slurm.runner import CommandResult, SlurmController
 
 
 class FakeRunner:

@@ -1,11 +1,9 @@
 # LLM-powered HPC cluster assistant
 
-The supplied project notes describe an `HPCAdminBot` that talks to an OpenAI-compatible chat-completions endpoint and exposes Slurm tools. The original prototype mixed API transport, chat history, tool schemas, subprocess execution, terminal input and credentials in one Python file.
-
-This repository separates those concerns:
+The supplied project notes describe an assistant that talks to an OpenAI-compatible chat-completions endpoint and exposes Slurm tools. The prototype's concerns are separated into focused modules:
 
 ```text
-assistant/
+ai_assistant/
 ├── config.py          # Environment-based settings; no committed credentials
 ├── api_client.py      # HTTP transport to an OpenAI-compatible endpoint
 ├── schemas.py         # Explicit function-tool JSON schemas

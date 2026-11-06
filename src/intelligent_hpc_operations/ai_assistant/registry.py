@@ -7,8 +7,8 @@ import logging
 from collections.abc import Callable
 from typing import Any
 
-from hpc_cluster_lab.assistant.schemas import tool_schemas
-from hpc_cluster_lab.slurm.runner import SlurmController
+from intelligent_hpc_operations.ai_assistant.schemas import tool_schemas
+from intelligent_hpc_operations.slurm.runner import SlurmController
 
 ApprovalCallback = Callable[[str], bool]
 logger = logging.getLogger(__name__)

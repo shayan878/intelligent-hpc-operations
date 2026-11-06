@@ -65,23 +65,26 @@ intelligent-hpc-operations/
 ├── .github/                         # CI, issue templates and Dependabot
 ├── assets/                          # Cluster architecture diagram
 ├── configs/
-│   ├── assistant/                   # Secret-free environment template
+│   ├── ai_assistant/                # Secret-free environment template
 │   ├── nfs/                         # Export and client mount examples
 │   └── slurm/                       # Slurm, cgroup and SlurmDBD templates
 ├── docs/
 │   ├── architecture/                # Cluster design
-│   ├── assistant/                   # LLM assistant design and safety model
+│   ├── ai_assistant/                # LLM assistant design and safety model
 │   ├── deployment/                  # NFS, Slurm and user identity setup
 │   ├── experiments/                 # Source-grounded internship observations
 │   ├── operations/                  # Accounting, cgroups, preemption, monitoring
 │   └── security/                    # Credential and NFS security notes
 ├── jobs/slurm/                      # Single-node, multi-node and policy examples
 ├── scripts/                         # Health checks and config preflight
-├── src/hpc_cluster_lab/
-│   ├── assistant/                   # API client, bot, config, tools and CLI
+├── src/intelligent_hpc_operations/
+│   ├── ai_assistant/                # API client, bot, config, tools and CLI
 │   ├── slurm/                       # Fixed-command Slurm adapter
 │   └── workloads/                   # Modular prime-number example
-└── tests/                           # Unit tests with mocked APIs/commands
+└── tests/
+    ├── ai_assistant/
+    ├── slurm/
+    └── workloads/
 ```
 
 ## Quick start
@@ -124,12 +127,12 @@ The distributed example partitions a half-open integer range using `SLURM_PROCID
 
 See [Slurm job examples](jobs/slurm/README.md), [deployment instructions](docs/deployment/slurm-controller-and-workers.md) and [configuration examples](configs/slurm/).
 
-### Configure the LLM assistant
+### Configure the AI assistant
 
 Copy the template, fill in your private endpoint settings and load them into the current shell:
 
 ```bash
-cp configs/assistant/.env.example .env
+cp configs/ai_assistant/.env.example .env
 # Edit .env locally. Never commit this file.
 set -a
 source .env
@@ -163,7 +166,7 @@ Drain/resume tools are restricted to `SLURM_ALLOWED_NODES`, require typing `yes`
 - [Partitions and preemption](docs/operations/preemption-and-partitions.md)
 - [Slurm accounting](docs/operations/accounting.md)
 - [Monitoring and node maintenance](docs/operations/monitoring-and-node-maintenance.md)
-- [LLM assistant design](docs/assistant/design.md)
+- [AI assistant design](docs/ai_assistant/design.md)
 - [Security guidance](docs/security/credential-handling.md)
 
 ## Source and reproducibility notes

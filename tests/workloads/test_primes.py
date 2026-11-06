@@ -1,4 +1,4 @@
-from hpc_cluster_lab.workloads.primes import (
+from intelligent_hpc_operations.workloads.primes import (
     count_primes_in_range,
     is_prime,
     partition_range,

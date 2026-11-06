@@ -1,6 +1,6 @@
-from hpc_cluster_lab.assistant.bot import HPCAdminBot
-from hpc_cluster_lab.assistant.registry import ToolRegistry
-from hpc_cluster_lab.slurm.runner import CommandResult, SlurmController
+from intelligent_hpc_operations.ai_assistant.bot import HPCAdminBot
+from intelligent_hpc_operations.ai_assistant.registry import ToolRegistry
+from intelligent_hpc_operations.slurm.runner import CommandResult, SlurmController
 
 
 class FakeRunner:
@@ -47,10 +47,8 @@ class ConstantClient:
 def test_bot_keeps_only_the_most_recent_complete_turns():
     registry = ToolRegistry(SlurmController(FakeRunner()))
     bot = HPCAdminBot(ConstantClient(), registry, max_history_turns=2)
-
     for index in range(4):
         assert bot.chat(f"question {index}") == "ok"
-
     user_messages = [item["content"] for item in bot.history if item["role"] == "user"]
     assert user_messages == ["question 2", "question 3"]
     assert bot.history[0]["role"] == "system"

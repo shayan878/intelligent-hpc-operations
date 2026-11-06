@@ -6,7 +6,7 @@ from typing import Any
 
 import httpx
 
-from hpc_cluster_lab.assistant.config import Settings
+from intelligent_hpc_operations.ai_assistant.config import Settings
 
 
 class OpenAICompatibleClient:

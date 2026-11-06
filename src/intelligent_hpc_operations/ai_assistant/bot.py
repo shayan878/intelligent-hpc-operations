@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from typing import Any, Protocol
 
-from hpc_cluster_lab.assistant.registry import ToolRegistry
+from intelligent_hpc_operations.ai_assistant.registry import ToolRegistry
 
 _SYSTEM_PROMPT = """You are an HPC operations assistant for a Slurm cluster.
 Use only the tools provided in this session to answer live cluster-state questions.

@@ -1,7 +1,7 @@
 import json
 
-from hpc_cluster_lab.assistant.registry import ToolRegistry
-from hpc_cluster_lab.slurm.runner import CommandResult, SlurmController
+from intelligent_hpc_operations.ai_assistant.registry import ToolRegistry
+from intelligent_hpc_operations.slurm.runner import CommandResult, SlurmController
 
 
 class FakeRunner:
@@ -65,7 +65,6 @@ def test_approved_admin_action_is_audited(caplog):
     )
     with caplog.at_level("INFO"):
         result = registry.execute("drain_node", {"node_name": "worker1"})
-
     assert result["ok"] is True
     assert "Administrative action requested" in caplog.text
     assert "Administrative action completed" in caplog.text

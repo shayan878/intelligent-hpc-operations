@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "intelligent-hpc-operations"
-version = "0.2.0"
+version = "0.3.0"
 description = "Modular Slurm cluster operations, distributed workloads and guarded LLM-assisted administration."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -29,8 +29,8 @@ dependencies = ["httpx>=0.27,<1"]
 dev = ["pytest>=8,<10", "ruff>=0.6,<1"]
 
 [project.scripts]
-hpc-cluster-assistant = "hpc_cluster_lab.assistant.cli:main"
-hpc-prime-workload = "hpc_cluster_lab.workloads.primes:main"
+hpc-cluster-assistant = "intelligent_hpc_operations.ai_assistant.cli:main"
+hpc-prime-workload = "intelligent_hpc_operations.workloads.primes:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

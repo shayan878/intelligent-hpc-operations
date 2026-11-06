@@ -33,7 +33,6 @@ def partition_range(start: int, end: int, rank: int, world_size: int) -> tuple[i
         raise ValueError("world_size must be at least 1")
     if rank < 0 or rank >= world_size:
         raise ValueError("rank must be in [0, world_size)")
-
     total = end - start
     base, remainder = divmod(total, world_size)
     local_start = start + rank * base + min(rank, remainder)
@@ -71,7 +70,6 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.end < args.start:
         raise SystemExit("--end must be greater than or equal to --start")
-
     rank = int(os.getenv("SLURM_PROCID", "0"))
     world_size = int(os.getenv("SLURM_NTASKS", "1"))
     local_start, local_end = partition_range(args.start, args.end, rank, world_size)
@@ -84,7 +82,6 @@ def main(argv: list[str] | None = None) -> int:
     }
     if args.include_primes:
         result["primes"] = primes_in_range(local_start, local_end)
-
     print(json.dumps(result, separators=(",", ":")))
     return 0
 
